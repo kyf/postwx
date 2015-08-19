@@ -1,22 +1,36 @@
 package postwx
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 )
 
 var (
 	tokenurl string = "http://m.6renyou.com/weixin_service/getAccessToken?account_type=1"
-	posturl  string = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token="
+
+	posturl string = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token="
+
+	uploadurl string = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=%s"
 )
 
 type Response struct {
 	Errcode int    `json:"errcode"`
 	Errmsg  string `json:"errmsg"`
+}
+
+type UploadResponse struct {
+	Type       string `json:"type"`
+	Media_id   string `json:"media_id"`
+	Created_at int64  `json:"created_at"`
 }
 
 func getAccessToken() ([]byte, error) {
@@ -40,7 +54,7 @@ func post(body string) (Response, error) {
 		return result, err
 	}
 
-	res, err := http.Post(fmt.Sprintf("%s%s", posturl, token), "application/x-form-urlencode", strings.NewReader(body))
+	res, err := http.Post(fmt.Sprintf("%s%s", posturl, token), "application/x-www-form-urlencoded", strings.NewReader(body))
 	if err != nil {
 		return result, err
 	}
@@ -63,5 +77,54 @@ func formatResponse(res Response) (bool, error) {
 	} else {
 		return false, errors.New(res.Errmsg)
 	}
+
+}
+
+func upload(fpath, mediaType string) (interface{}, error) {
+	var result interface{}
+	file, err := os.Open(fpath)
+	if err != nil {
+		return result, err
+	}
+
+	token, err := getAccessToken()
+	if err != nil {
+		return result, err
+	}
+
+	url := fmt.Sprintf(uploadurl, token, mediaType)
+	buffer := bytes.NewBuffer(nil)
+	writer := multipart.NewWriter(buffer)
+	part, err := writer.CreateFormFile("media", filepath.Base(fpath))
+	if err != nil {
+		return result, err
+	}
+
+	_, err = io.Copy(part, file)
+	if err != nil {
+		return result, err
+	}
+
+	err = writer.Close()
+	if err != nil {
+		return result, err
+	}
+
+	bodyType := writer.FormDataContentType()
+	res, err := http.Post(url, bodyType, buffer)
+	if err != nil {
+		return result, err
+	}
+
+	rev, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return result, err
+	}
+
+	err = json.Unmarshal(rev, &result)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 
 }

@@ -1,6 +1,7 @@
 package postwx
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -36,5 +37,26 @@ func PostImage(openid, media_id string) (bool, error) {
 		return false, err
 	}
 	return formatResponse(res)
+
+}
+
+func UploadMedia(filepath, mediaType string) (string, error) {
+	res, err := upload(filepath, mediaType)
+	if err != nil {
+		return "", err
+	}
+
+	if result, ok := res.(map[string]interface{}); ok {
+		if errmsg, ok := result["errmsg"]; ok {
+			msg, _ := errmsg.(string)
+			return "", errors.New(msg)
+		} else {
+			media_id := result["media_id"]
+			media, _ := media_id.(string)
+			return media, nil
+		}
+	} else {
+		return "", errors.New("Unknwon error")
+	}
 
 }

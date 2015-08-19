@@ -1,6 +1,7 @@
 package postwx
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -16,8 +17,19 @@ func TestPostText(t *testing.T) {
 }
 
 func TestPostImage(t *testing.T) {
-	_, err := PostImage(openid, "kyf")
+	_, err := PostImage(openid, "Y0EtjhANujDworpFLdm7p-1UfPW1H89lu-WU0dRvZzhfzknDKqmke3htopGc-ku8")
 	if err != nil {
 		t.Errorf("%v", err)
+	}
+}
+
+func TestUploadMedia(t *testing.T) {
+	filepath := "/work/gopro/src/6renyou/postwx/gtl.jpg"
+	mediaType := "image"
+	media_id, err := UploadMedia(filepath, mediaType)
+	if err != nil {
+		t.Errorf("%v", err)
+	} else {
+		fmt.Println("media_id is ", media_id)
 	}
 }
