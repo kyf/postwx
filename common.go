@@ -137,45 +137,46 @@ func upload(fpath, mediaType string) (interface{}, error) {
 
 }
 
-func downloadMedia(media_id, savepath string) error {
+func downloadMedia(media_id, savepath string) ([]byte, error) {
 	token, err := getAccessToken()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	url := fmt.Sprintf(mediaurl, token, media_id)
 	res, err := http.Get(url)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	contentType := res.Header.Get("Content-Type")
 	if strings.EqualFold(contentType, "text/plain") {
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		var response Response
 		err = json.Unmarshal(body, &response)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		_, err = formatResponse(response)
-		return err
+		return nil, err
 	} else {
 		ext := mediatype[contentType]
 
-		file, err := os.Create(fmt.Sprintf("%s%s", savepath, ext))
+		fullpath := fmt.Sprintf("%s%s", savepath, ext)
+		file, err := os.Create(fullpath)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		defer file.Close()
 
 		_, err = io.Copy(file, res.Body)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		return nil
+		return []byte(fullpath), nil
 	}
 }

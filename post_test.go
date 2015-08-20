@@ -37,10 +37,10 @@ func TestUploadMedia(t *testing.T) {
 func TestGetMedia(t *testing.T) {
 	media_id := "2XORNpyFZfl8iwUAHARfZzyxVcNubUgijT4e8dW0kbUfytyFnKyKhmEzKxQ--_b9"
 	savepath := "/home/kyf/media/"
-	err := GetMedia(media_id, fmt.Sprintf("%s%s", savepath, media_id))
+	fullpath, err := GetMedia(media_id, fmt.Sprintf("%s%s", savepath, media_id))
 	if err != nil {
 		t.Errorf("%v", err)
 	} else {
-		fmt.Println("file save success!")
+		fmt.Println("file save success!", string(fullpath))
 	}
 }

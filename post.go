@@ -61,6 +61,6 @@ func UploadMedia(filepath, mediaType string) (string, error) {
 
 }
 
-func GetMedia(media_id, savepath string) error {
+func GetMedia(media_id, savepath string) ([]byte, error) {
 	return downloadMedia(media_id, savepath)
 }
