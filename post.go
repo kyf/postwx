@@ -60,3 +60,7 @@ func UploadMedia(filepath, mediaType string) (string, error) {
 	}
 
 }
+
+func GetMedia(media_id, savepath string) error {
+	return downloadMedia(media_id, savepath)
+}

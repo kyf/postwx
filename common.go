@@ -20,6 +20,14 @@ var (
 	posturl string = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token="
 
 	uploadurl string = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=%s"
+
+	mediaurl string = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=%s&media_id=%s"
+
+	mediatype map[string]string = map[string]string{
+		"image/jpeg": ".jpg",
+		"image/gif":  ".gif",
+		"image/png":  ".png",
+	}
 )
 
 type Response struct {
@@ -127,4 +135,47 @@ func upload(fpath, mediaType string) (interface{}, error) {
 	}
 	return result, nil
 
+}
+
+func downloadMedia(media_id, savepath string) error {
+	token, err := getAccessToken()
+	if err != nil {
+		return err
+	}
+
+	url := fmt.Sprintf(mediaurl, token, media_id)
+	res, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+
+	contentType := res.Header.Get("Content-Type")
+	if strings.EqualFold(contentType, "text/plain") {
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+		var response Response
+		err = json.Unmarshal(body, &response)
+		if err != nil {
+			return err
+		}
+
+		_, err = formatResponse(response)
+		return err
+	} else {
+		ext := mediatype[contentType]
+
+		file, err := os.Create(fmt.Sprintf("%s%s", savepath, ext))
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		_, err = io.Copy(file, res.Body)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
 }
