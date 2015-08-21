@@ -27,6 +27,7 @@ var (
 		"image/jpeg": ".jpg",
 		"image/gif":  ".gif",
 		"image/png":  ".png",
+		"audio/amr":  ".amr",
 	}
 )
 
