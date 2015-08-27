@@ -17,11 +17,13 @@ import (
 var (
 	tokenurl string = "http://m.6renyou.com/weixin_service/getAccessToken?account_type=1"
 
-	posturl string = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token="
+	posturl string = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=%s"
 
 	uploadurl string = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=%s"
 
 	mediaurl string = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=%s&media_id=%s"
+
+	tplurl string = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s"
 
 	mediatype map[string]string = map[string]string{
 		"image/jpeg": ".jpg",
@@ -56,14 +58,14 @@ func getAccessToken() ([]byte, error) {
 	return body, nil
 }
 
-func post(body string) (Response, error) {
+func post(body, posturl string) (Response, error) {
 	var result Response
 	token, err := getAccessToken()
 	if err != nil {
 		return result, err
 	}
 
-	res, err := http.Post(fmt.Sprintf("%s%s", posturl, token), "application/x-www-form-urlencoded", strings.NewReader(body))
+	res, err := http.Post(fmt.Sprintf(posturl, token), "application/x-www-form-urlencoded", strings.NewReader(body))
 	if err != nil {
 		return result, err
 	}

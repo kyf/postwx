@@ -10,19 +10,21 @@ var (
 )
 
 func TestPostText(t *testing.T) {
-	_, err := PostText(openid, "post text testing ...")
+	content := `post text ...`
+	_, err := PostText(openid, content)
 	if err != nil {
 		t.Errorf("%v", err)
 	}
 }
 
 func TestPostImage(t *testing.T) {
-	_, err := PostImage(openid, "Y0EtjhANujDworpFLdm7p-1UfPW1H89lu-WU0dRvZzhfzknDKqmke3htopGc-ku8")
+	_, err := PostImage(openid, "F5HOIcB87Aw3KyAIsLzwntp9t5nDoVN8GUZktX0syoiFmvZHTJd2Egv_MyUwnpmv")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
 }
 
+/*
 func TestUploadMedia(t *testing.T) {
 	filepath := "/work/gopro/src/6renyou/postwx/gtl.jpg"
 	mediaType := "image"
@@ -43,4 +45,53 @@ func TestGetMedia(t *testing.T) {
 	} else {
 		fmt.Println("file save success!", string(fullpath))
 	}
+}
+
+*/
+
+func TestPostTpl(t *testing.T) {
+	tpl_id := "e5sFqp2BHA4OhbzOpzeqmi0ir6lT9sA3DanMOYOPhRI"
+	url := "http://www.6renyou.com/"
+	color := map[string]string{
+		"top":    "#FF0000",
+		"first":  "#000000",
+		"data":   "#3eb166",
+		"remark": "#939393",
+	}
+
+	data := `{
+		"touser":"%s",
+		"template_id":"%s",
+		"url":"%s",
+		"topcolor":"%s",
+		"data":{
+			"first":{
+				"value":"",
+				"color":"%s"
+			},
+			"keyword1":{
+				"value":"微信客户端",
+				"color":"%s"
+			},
+			"keyword2": {
+				"value":"王子于线路(上海出发|台湾台北5天4晚自由行）申请了团长",
+				"color":"%s"
+			},
+			"keyword3": {
+				"value":"2015年7月16 11:12:12",
+				"color":"%s"
+			},
+			"remark":{
+				"value":"",
+				"color":"%s"
+			}
+		}
+	}`
+
+	d := fmt.Sprintf(data, openid, tpl_id, url, color["top"], color["first"], color["data"], color["data"], color["data"], color["remark"])
+	_, err := PostTpl(d)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
 }

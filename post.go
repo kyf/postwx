@@ -15,7 +15,7 @@ func PostText(openid, content string) (bool, error) {
 				}
 			}`
 
-	res, err := post(fmt.Sprintf(msg, openid, content))
+	res, err := post(fmt.Sprintf(msg, openid, content), posturl)
 	if err != nil {
 		return false, err
 	}
@@ -32,7 +32,7 @@ func PostImage(openid, media_id string) (bool, error) {
 				}
 			}`
 
-	res, err := post(fmt.Sprintf(msg, openid, media_id))
+	res, err := post(fmt.Sprintf(msg, openid, media_id), posturl)
 	if err != nil {
 		return false, err
 	}
@@ -63,4 +63,13 @@ func UploadMedia(filepath, mediaType string) (string, error) {
 
 func GetMedia(media_id, savepath string) ([]byte, error) {
 	return downloadMedia(media_id, savepath)
+}
+
+func PostTpl(data string) (bool, error) {
+	res, err := post(data, tplurl)
+	if err != nil {
+		return false, err
+	}
+	return formatResponse(res)
+
 }
