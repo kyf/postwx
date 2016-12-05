@@ -50,6 +50,7 @@ func getAccessToken() ([]byte, error) {
 		return nil, err
 	}
 
+	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
@@ -69,6 +70,7 @@ func post(body, posturl string) (Response, error) {
 	if err != nil {
 		return result, err
 	}
+	defer res.Body.Close()
 
 	rev, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -126,6 +128,7 @@ func upload(fpath, mediaType string) (interface{}, error) {
 	if err != nil {
 		return result, err
 	}
+	defer res.Body.Close()
 
 	rev, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -151,6 +154,7 @@ func downloadMedia(media_id, savepath string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer res.Body.Close()
 
 	contentType := res.Header.Get("Content-Type")
 	if strings.EqualFold(contentType, "text/plain") {
