@@ -88,7 +88,7 @@ func formatResponse(res Response) (bool, error) {
 	if res.Errcode == 0 {
 		return true, nil
 	} else {
-		return false, errors.New(res.Errmsg)
+		return false, errors.New(fmt.Sprintf("[%d]%s", res.Errcode, res.Errmsg))
 	}
 
 }
